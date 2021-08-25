@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ЧастотныйАнализТекста
@@ -32,54 +33,42 @@ namespace ЧастотныйАнализТекста
         public void ReadText(string path)
         {
             string text = "";
+            int time = 0;
             try
             {
 
                 using (StreamReader sr = new StreamReader(path, System.Text.Encoding.Default))
                 {
-
-                    //    string line;
-                    //    string ss ="";
-                   // while (sr.ReadToEnd() != null)
-                    //    while ((line = sr.ReadLine()) != null)
-                    {
                          text = sr.ReadToEnd();
-                        //        Console.WriteLine(line);
-                        //        string[] s1 = line.Split();
-
-                        //        for (int j = 0; j < s1.Length; j++)
-                        //        {
-                        //            line = s1[j];
-                        //            for (int i = 0; i < line.Length - 2; i++)
-                        //            {
-                        //                ss = line.Substring(i, 3);
-                        //                Console.WriteLine(ss);
-
-                        //            }
-                        //        }
-                        //    }
-                    }
-                        var startTime = System.Diagnostics.Stopwatch.StartNew();
-
-                        var groups = SwimParts(text, 3).Where(str => str.All(ch => char.IsLetter(ch)))
-                       .GroupBy(str => str);
-
-
-                        Console.WriteLine(string.Join
-                            (
-                                Environment.NewLine,
-                                groups.OrderByDescending(gr => gr.Count()).Take(10).Select(gr => $"\"{gr.Key}\" встретилось {gr.Count()} раз")
-                            ));
-
-                        startTime.Stop();
-                        var resultTime = startTime.Elapsed;
-                        }
+                    Console.WriteLine();
+             
+                    new Thread(() => Serch(text, time)).Start();      
+                }
                     } 
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
 
+        }
+
+        public void Serch(string text, int time)
+        {
+            var startTime = System.Diagnostics.Stopwatch.StartNew();
+            var groups = SwimParts(text, 3).Where(str => str.All(ch => char.IsLetter(ch)))
+                     .GroupBy(str => str);
+
+
+            Console.WriteLine(string.Join
+                (
+                    ",",
+                    groups.OrderByDescending(gr => gr.Count()).Take(10).Select(gr => $"\"{gr.Key}\"")
+                ));
+            startTime.Stop();
+            var resultTime = startTime.Elapsed;
+            time = resultTime.Milliseconds;
+            Console.WriteLine();
+            Console.WriteLine("Время выполнения программы: " + time + " мс");
         }
     }
 }
